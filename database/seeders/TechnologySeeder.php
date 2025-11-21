@@ -1,0 +1,19 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Technology;
+use Illuminate\Database\Seeder;
+
+class TechnologySeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        Technology::factory(19)->create();
+
+        $this->command->info('✅ Created ' . Technology::count() . ' technologies');
+    }
+}
