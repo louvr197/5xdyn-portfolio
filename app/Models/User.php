@@ -36,6 +36,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+
     /**
      * Get the attributes that should be cast.
      *
@@ -48,5 +49,28 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Relationships
+     */
+    public function experiences()
+    {
+        return $this->hasMany(Experience::class);
+    }
+
+    public function formations()
+    {
+        return $this->hasMany(Formation::class);
+    }
+
+    public function information()
+    {
+        return $this->hasOne(Information::class);
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
     }
 }
