@@ -19,12 +19,14 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('short_description');
             $table->text('long_description')->nullable();
+            $table->enum('type', ['website', 'mobile_app', 'api', 'design', 'other'])->default('website');
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->enum('context', ['academic', 'internship', 'freelance', 'personal', 'professional']);
             $table->date('completion_date');
             $table->string('client')->nullable();
             $table->integer('duration_hours')->nullable();
             $table->string('role');
+            $table->string('main_image')->nullable();
             $table->string('github_link')->nullable();
             $table->string('site_link')->nullable();
             $table->integer('display_order')->default(0);

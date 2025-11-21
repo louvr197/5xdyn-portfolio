@@ -23,6 +23,12 @@ class Information extends Model
         'availability',
         'bio',
         'picture_path',
+        'cv_path',
+        'social_links',
+    ];
+
+    protected $casts = [
+        'social_links' => 'array',
     ];
 
     public function user()

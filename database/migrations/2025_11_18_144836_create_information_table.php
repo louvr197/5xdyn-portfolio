@@ -24,6 +24,8 @@ return new class extends Migration
             $table->text('availability')->nullable();
             $table->text('bio')->nullable();
             $table->string('picture_path')->nullable();
+            $table->string('cv_path')->nullable();
+            $table->json('social_links')->nullable();
         });
     }
 
