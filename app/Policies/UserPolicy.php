@@ -12,6 +12,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Users can see their own profile, admins can see all users
         return true;
     }
 
@@ -28,7 +29,8 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        // Only admins can create new users
+        return $user->role === 'admin';
     }
 
     /**
@@ -36,7 +38,8 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->id === $model->id;
+        // Users can update themselves, admins can update anyone
+        return $user->id === $model->id || $user->role === 'admin';
     }
 
     /**
@@ -44,7 +47,8 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->id === $model->id;
+        // Only admins can delete users, but not themselves
+        return $user->role === 'admin' && $user->id !== $model->id;
     }
 
     /**
@@ -52,7 +56,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->id === $model->id;
+        return $user->role === 'admin';
     }
 
     /**
@@ -60,6 +64,32 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->id === $model->id;
+        return $user->role === 'admin' && $user->id !== $model->id;
+    }
+
+    /**
+     * Determine if the user can change roles.
+     */
+    public function changeRole(User $user, User $model): bool
+    {
+        // Admin cannot change their own role
+        return $user->role === 'admin' && $user->id !== $model->id;
+    }
+
+    /**
+     * Determine if the user can update passwords.
+     */
+    public function updatePassword(User $user, User $model): bool
+    {
+        // Users can update their own password, admins can update any password
+        return $user->id === $model->id || $user->role === 'admin';
+    }
+
+    /**
+     * Determine if the user can access admin panel.
+     */
+    public function accessAdmin(User $user): bool
+    {
+        return $user->role === 'admin';
     }
 }

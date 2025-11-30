@@ -25,6 +25,7 @@ class Information extends Model
         'picture_path',
         'cv_path',
         'social_links',
+        'theme_color',
     ];
 
     protected $casts = [

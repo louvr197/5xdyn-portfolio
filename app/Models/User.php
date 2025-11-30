@@ -20,8 +20,10 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'slug',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -72,5 +74,15 @@ class User extends Authenticatable
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function technologies()
+    {
+        return $this->hasMany(Technology::class);
+    }
+
+    public function techniques()
+    {
+        return $this->hasMany(Technique::class);
     }
 }

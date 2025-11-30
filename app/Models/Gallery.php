@@ -15,6 +15,7 @@ class Gallery extends Model
     protected $fillable = [
         'title',
         'project_id',
+        'parent_id',
     ];
 
     public function images()
@@ -25,5 +26,15 @@ class Gallery extends Model
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Gallery::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Gallery::class, 'parent_id');
     }
 }

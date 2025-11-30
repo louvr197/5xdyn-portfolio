@@ -11,11 +11,17 @@ class Technique extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'description',
         'proficiency_level',
         'display_order',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function projects()
     {
