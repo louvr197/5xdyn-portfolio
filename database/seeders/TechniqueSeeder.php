@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Technique;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class TechniqueSeeder extends Seeder
@@ -12,8 +13,14 @@ class TechniqueSeeder extends Seeder
      */
     public function run(): void
     {
-        Technique::factory(12)->create();
+        $users = User::all();
 
-        $this->command->info('✅ Created ' . Technique::count() . ' techniques');
+        foreach ($users as $user) {
+            Technique::factory(4)->create([
+                'user_id' => $user->id,
+            ]);
+        }
+
+        $this->command->info('✅ Created ' . Technique::count() . ' techniques for ' . $users->count() . ' users');
     }
 }

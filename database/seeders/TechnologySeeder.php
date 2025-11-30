@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Technology;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class TechnologySeeder extends Seeder
@@ -12,8 +13,14 @@ class TechnologySeeder extends Seeder
      */
     public function run(): void
     {
-        Technology::factory(19)->create();
+        $users = User::all();
 
-        $this->command->info('✅ Created ' . Technology::count() . ' technologies');
+        foreach ($users as $user) {
+            Technology::factory(6)->create([
+                'user_id' => $user->id,
+            ]);
+        }
+
+        $this->command->info('✅ Created ' . Technology::count() . ' technologies for ' . $users->count() . ' users');
     }
 }

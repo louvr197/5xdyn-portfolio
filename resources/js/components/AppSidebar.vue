@@ -29,9 +29,11 @@ import {
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import { computed } from 'vue';
+import { Settings } from 'lucide-vue-next';
 
 const page = usePage();
 const isAdmin = computed(() => page.props.auth?.isAdmin === true);
+const userId = computed(() => page.props.auth?.user?.id);
 
 const mainNavItems: NavItem[] = [
     {
@@ -77,13 +79,18 @@ const portfolioNavItems: NavItem[] = [
 const settingsNavItems: NavItem[] = [
     {
         title: 'Informations',
-        href: '/profile',
+        href: `/users/${userId.value}/edit`,
         icon: User,
     },
     {
         title: 'Portfolio Public',
         href: '/portfolios',
         icon: Globe,
+    },
+    {
+        title: 'Paramètres',
+        href: '/settings/profile',
+        icon: Settings,
     },
 ];
 
