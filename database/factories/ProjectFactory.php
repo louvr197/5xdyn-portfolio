@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
@@ -50,7 +52,18 @@ class ProjectFactory extends Factory
             'role' => $isWebProject
                 ? fake()->randomElement(['Développeur Full Stack', 'Développeur Frontend', 'Développeur Backend', 'Lead Développeur'])
                 : fake()->randomElement(['Artiste', 'Sculpteur', 'Peintre', 'Artiste Commissionnée']),
-            'main_image' => 'projects/' . fake()->uuid() . '.jpg',
+            'main_image' => function () {
+                $randomName = Str::uuid();
+                $imageUrl = "https://picsum.photos/1200/800.webp?random={$randomName}";
+                $path = "projects/{$randomName}.webp";
+
+                try {
+                    Storage::disk('public')->put($path, file_get_contents($imageUrl));
+                    return $path;
+                } catch (\Exception $e) {
+                    return null;
+                }
+            },
             'github_link' => $isWebProject && fake()->boolean(70) ? 'https://github.com/user/' . $slug : null,
             'site_link' => fake()->boolean(40) ? 'https://' . $slug . '.example.com' : null,
             'display_order' => fake()->numberBetween(0, 100),

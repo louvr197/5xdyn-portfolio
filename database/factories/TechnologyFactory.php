@@ -48,6 +48,7 @@ class TechnologyFactory extends Factory
         $tech = fake()->unique()->randomElement($technologies);
 
         return [
+            'user_id' => 1, // Default to first user
             'name' => $tech['name'],
             'category' => $tech['category'],
             'proficiency_level' => fake()->randomElement(['beginner', 'intermediate', 'advanced', 'expert']),

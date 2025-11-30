@@ -35,6 +35,7 @@ class TechniqueFactory extends Factory
         $technique = fake()->unique()->randomElement($techniques);
 
         return [
+            'user_id' => 1, // Default to first user
             'name' => $technique['name'],
             'description' => $technique['description'],
             'proficiency_level' => fake()->randomElement(['beginner', 'intermediate', 'advanced', 'expert']),
