@@ -13,9 +13,25 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    LayoutGrid,
+    FolderKanban,
+    Wrench,
+    Target,
+    Briefcase,
+    GraduationCap,
+    Image,
+    User,
+    Globe,
+    Palette,
+    Users
+} from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
+import { computed } from 'vue';
+
+const page = usePage();
+const isAdmin = computed(() => page.props.auth?.isAdmin === true);
 
 const mainNavItems: NavItem[] = [
     {
@@ -25,16 +41,57 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const portfolioNavItems: NavItem[] = [
     {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
+        title: 'Projets',
+        href: '/projects',
+        icon: FolderKanban,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
+        title: 'Technologies',
+        href: '/technologies',
+        icon: Wrench,
+    },
+    {
+        title: 'Techniques',
+        href: '/techniques',
+        icon: Palette,
+    },
+    {
+        title: 'Expériences',
+        href: '/experiences',
+        icon: Briefcase,
+    },
+    {
+        title: 'Formations',
+        href: '/formations',
+        icon: GraduationCap,
+    },
+    {
+        title: 'Galeries',
+        href: '/galleries',
+        icon: Image,
+    },
+];
+
+const settingsNavItems: NavItem[] = [
+    {
+        title: 'Informations',
+        href: '/profile',
+        icon: User,
+    },
+    {
+        title: 'Portfolio Public',
+        href: '/portfolios',
+        icon: Globe,
+    },
+];
+
+const adminNavItems: NavItem[] = [
+    {
+        title: 'Gestion des utilisateurs',
+        href: '/admin/users',
+        icon: Users,
     },
 ];
 </script>
@@ -54,11 +111,13 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMain :items="mainNavItems" label="Navigation" />
+            <NavMain :items="portfolioNavItems" label="Portfolio" />
+            <NavMain :items="settingsNavItems" label="Paramètres" />
+            <NavMain v-if="isAdmin" :items="adminNavItems" label="Administration" />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
