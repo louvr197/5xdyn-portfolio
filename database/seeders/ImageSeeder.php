@@ -16,9 +16,9 @@ class ImageSeeder extends Seeder
         $galleries = Gallery::all();
 
         foreach ($galleries as $gallery) {
-            $imageCount = $gallery->project->user->email === 'test@example.com'
-                ? rand(3, 6)  // Web dev projects: 3-6 images
-                : rand(4, 8); // Art projects: 4-8 images
+            $imageCount = in_array($gallery->project->user->email, ['test@example.com', 'test2@example.com'])
+                ? rand(3, 6)  // 3-6 images per gallery
+                : rand(4, 8);
 
             Image::factory($imageCount)->create([
                 'gallery_id' => $gallery->id,

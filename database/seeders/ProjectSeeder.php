@@ -16,7 +16,7 @@ class ProjectSeeder extends Seeder
     public function run(): void
     {
         $webDev = User::where('email', 'test@example.com')->first();
-        $artist = User::where('email', 'sophie@example.com')->first();
+        $testUser2 = User::where('email', 'test2@example.com')->first();
         $technologies = Technology::all();
         $techniques = Technique::all();
 
@@ -34,22 +34,80 @@ class ProjectSeeder extends Seeder
             }
         }
 
-        // Artist projects
-        if ($artist) {
-            $artProjects = Project::factory(10)->create(['user_id' => $artist->id]);
+        // Test User 2 - Artist projects (paintings, drawings, prints, screen prints)
+        if ($testUser2) {
+            $artistProjects = [
+                [
+                    'title' => 'Série de Portraits Contemporains',
+                    'slug' => 'serie-portraits-contemporains',
+                    'short_description' => 'Collection de 12 portraits à l\'huile explorant l\'identité moderne',
+                    'type' => 'design',
+                    'status' => 'published',
+                ],
+                [
+                    'title' => 'Paysages Urbains - Sérigraphies',
+                    'slug' => 'paysages-urbains-serigraphies',
+                    'short_description' => 'Série de 8 sérigraphies représentant des scènes urbaines abstraites',
+                    'type' => 'design',
+                    'status' => 'published',
+                ],
+                [
+                    'title' => 'Collection Aquarelle Nature',
+                    'slug' => 'collection-aquarelle-nature',
+                    'short_description' => 'Études botaniques à l\'aquarelle, inspiration japonaise',
+                    'type' => 'design',
+                    'status' => 'published',
+                ],
+                [
+                    'title' => 'Affiches Typographiques',
+                    'slug' => 'affiches-typographiques',
+                    'short_description' => 'Série d\'affiches expérimentales mêlant typographie et illustration',
+                    'type' => 'design',
+                    'status' => 'published',
+                ],
+                [
+                    'title' => 'Dessins au Fusain - Corps en Mouvement',
+                    'slug' => 'dessins-fusain-corps-mouvement',
+                    'short_description' => 'Études de mouvement et d\'anatomie au fusain et pierre noire',
+                    'type' => 'other',
+                    'status' => 'published',
+                ],
+                [
+                    'title' => 'Gravures Abstraites',
+                    'slug' => 'gravures-abstraites',
+                    'short_description' => 'Exploration de la gravure sur métal avec motifs géométriques',
+                    'type' => 'design',
+                    'status' => 'draft',
+                ],
+            ];
 
-            foreach ($artProjects as $project) {
-                // Attach art materials
-                $project->technologies()->attach(
-                    $technologies->where('category', 'other')
-                        ->random(rand(2, 4))
-                        ->pluck('id')
-                );
+            foreach ($artistProjects as $projectData) {
+                $project = Project::factory()->create([
+                    'user_id' => $testUser2->id,
+                    'title' => $projectData['title'],
+                    'slug' => $projectData['slug'],
+                    'short_description' => $projectData['short_description'],
+                    'type' => $projectData['type'],
+                    'status' => $projectData['status'],
+                    'context' => 'personal',
+                    'role' => 'Artiste',
+                ]);
+
+                // Attach art materials/technologies
+                if ($technologies->where('category', 'other')->count() > 0) {
+                    $project->technologies()->attach(
+                        $technologies->where('category', 'other')
+                            ->random(min(3, $technologies->where('category', 'other')->count()))
+                            ->pluck('id')
+                    );
+                }
 
                 // Attach art techniques
-                $project->techniques()->attach(
-                    $techniques->random(rand(2, 4))->pluck('id')
-                );
+                if ($techniques->count() > 0) {
+                    $project->techniques()->attach(
+                        $techniques->random(min(2, $techniques->count()))->pluck('id')
+                    );
+                }
             }
         }
 

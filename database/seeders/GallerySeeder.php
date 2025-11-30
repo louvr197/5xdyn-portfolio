@@ -15,25 +15,34 @@ class GallerySeeder extends Seeder
     public function run(): void
     {
         $webDev = User::where('email', 'test@example.com')->first();
-        $artist = User::where('email', 'sophie@example.com')->first();
+        $testUser2 = User::where('email', 'test2@example.com')->first();
 
-        // Web developer galleries (1 per project)
+        // Web developer galleries (1 per project + 1 subgallery)
         if ($webDev) {
             $webProjects = Project::where('user_id', $webDev->id)->get();
             foreach ($webProjects as $project) {
-                Gallery::factory()->create([
+                $mainGallery = Gallery::factory()->create([
                     'project_id' => $project->id,
                     'title' => 'Captures d\'écran',
                 ]);
+
+                // Create a subgallery for the first project
+                if ($project->id === $webProjects->first()->id) {
+                    Gallery::factory()->create([
+                        'project_id' => $project->id,
+                        'parent_id' => $mainGallery->id,
+                        'title' => 'Détails UI',
+                    ]);
+                }
             }
         }
 
-        // Artist galleries (3 per project)
-        if ($artist) {
-            $artProjects = Project::where('user_id', $artist->id)->get();
-            $galleryTypes = ['Galerie Principale', 'Processus de Création', 'Esquisses'];
+        // Test User 2 galleries (2 per project)
+        if ($testUser2) {
+            $user2Projects = Project::where('user_id', $testUser2->id)->get();
+            $galleryTypes = ['Galerie Principale', 'Détails'];
 
-            foreach ($artProjects as $project) {
+            foreach ($user2Projects as $project) {
                 foreach ($galleryTypes as $galleryTitle) {
                     Gallery::factory()->create([
                         'project_id' => $project->id,
