@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->string('title');
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
+            $table->foreignId('parent_id')->nullable()->constrained('galleries')->onDelete('cascade');
         });
     }
 

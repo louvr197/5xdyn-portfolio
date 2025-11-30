@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('techniques', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
             $table->enum('proficiency_level', ['beginner', 'intermediate', 'advanced', 'expert']);

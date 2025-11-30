@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('picture_path')->nullable();
             $table->string('cv_path')->nullable();
             $table->json('social_links')->nullable();
+            $table->string('theme_color', 7)->default('#0ea5e9'); // Couleur principale du portfolio (hex)
         });
     }
 
