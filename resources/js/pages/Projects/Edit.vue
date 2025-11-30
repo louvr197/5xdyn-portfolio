@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import TiptapEditor from '@/components/TiptapEditor.vue';
 import {
     Select,
     SelectContent,
@@ -20,11 +21,17 @@ import { ref } from 'vue';
 interface Technology {
     id: number;
     name: string;
+    category: string;
+    proficiency_level: string;
+    logo_path: string | null;
+    color_code: string | null;
 }
 
 interface Technique {
     id: number;
     name: string;
+    description: string | null;
+    proficiency_level: string;
 }
 
 interface Project {
@@ -130,11 +137,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <!-- Long Description -->
                         <div class="space-y-2">
                             <Label for="long_description">Description détaillée</Label>
-                            <Textarea
-                                id="long_description"
+                            <TiptapEditor
                                 v-model="form.long_description"
-                                rows="8"
-                                :class="{ 'border-red-500': form.errors.long_description }"
+                                placeholder="Décrivez votre projet en détail..."
                             />
                             <p v-if="form.errors.long_description" class="text-sm text-red-500">
                                 {{ form.errors.long_description }}
@@ -268,11 +273,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </CardHeader>
                     <CardContent>
                         <!-- Technologies -->
-                        <div v-if="showTechnologies" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-if="showTechnologies" class="space-y-2">
                             <div
                                 v-for="tech in technologies"
                                 :key="tech.id"
-                                class="flex items-center space-x-2"
+                                class="flex items-center gap-3 p-2 rounded border hover:bg-accent"
                             >
                                 <Checkbox
                                     :id="`tech-${tech.id}`"
@@ -285,18 +290,42 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         }
                                     }"
                                 />
-                                <Label :for="`tech-${tech.id}`" class="cursor-pointer">
-                                    {{ tech.name }}
+                                <img
+                                    v-if="tech.logo_path"
+                                    :src="`/storage/${tech.logo_path}`"
+                                    :alt="tech.name"
+                                    class="w-6 h-6 object-contain"
+                                />
+                                <div
+                                    v-else
+                                    class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white"
+                                    :style="{ backgroundColor: tech.color_code || '#666' }"
+                                >
+                                    {{ tech.name.substring(0, 2).toUpperCase() }}
+                                </div>
+                                <Label :for="`tech-${tech.id}`" class="cursor-pointer flex-1">
+                                    <div class="font-medium">{{ tech.name }}</div>
+                                    <div class="text-xs text-muted-foreground">
+                                        {{ tech.category === 'backend' ? 'Backend' :
+                                           tech.category === 'frontend' ? 'Frontend' :
+                                           tech.category === 'database' ? 'Base de données' :
+                                           tech.category === 'devops' ? 'DevOps' :
+                                           tech.category === 'design' ? 'Design' : 'Autre' }}
+                                        ·
+                                        {{ tech.proficiency_level === 'beginner' ? 'Débutant' :
+                                           tech.proficiency_level === 'intermediate' ? 'Intermédiaire' :
+                                           tech.proficiency_level === 'advanced' ? 'Avancé' : 'Expert' }}
+                                    </div>
                                 </Label>
                             </div>
                         </div>
 
                         <!-- Techniques -->
-                        <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-else class="space-y-2">
                             <div
                                 v-for="technique in techniques"
                                 :key="technique.id"
-                                class="flex items-center space-x-2"
+                                class="flex items-start gap-3 p-2 rounded border hover:bg-accent"
                             >
                                 <Checkbox
                                     :id="`technique-${technique.id}`"
@@ -308,9 +337,18 @@ const breadcrumbs: BreadcrumbItem[] = [
                                             form.technique_ids = form.technique_ids.filter(id => id !== technique.id);
                                         }
                                     }"
+                                    class="mt-1"
                                 />
-                                <Label :for="`technique-${technique.id}`" class="cursor-pointer">
-                                    {{ technique.name }}
+                                <Label :for="`technique-${technique.id}`" class="cursor-pointer flex-1">
+                                    <div class="font-medium">{{ technique.name }}</div>
+                                    <div class="text-xs text-muted-foreground">
+                                        {{ technique.proficiency_level === 'beginner' ? 'Débutant' :
+                                           technique.proficiency_level === 'intermediate' ? 'Intermédiaire' :
+                                           technique.proficiency_level === 'advanced' ? 'Avancé' : 'Expert' }}
+                                    </div>
+                                    <p v-if="technique.description" class="text-xs text-muted-foreground mt-1">
+                                        {{ technique.description }}
+                                    </p>
                                 </Label>
                             </div>
                         </div>

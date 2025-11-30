@@ -9,11 +9,17 @@ import { Badge } from '@/components/ui/badge';
 interface Technology {
     id: number;
     name: string;
+    category: string;
+    proficiency_level: string;
+    logo_path: string | null;
+    color_code: string | null;
 }
 
 interface Technique {
     id: number;
     name: string;
+    description: string | null;
+    proficiency_level: string;
 }
 
 interface Image {
@@ -149,14 +155,48 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <CardTitle>Technologies</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div class="flex flex-wrap gap-2">
-                            <Badge
+                        <div class="space-y-3">
+                            <div
                                 v-for="tech in project.technologies"
                                 :key="tech.id"
-                                variant="secondary"
+                                class="flex items-center gap-3 p-2 rounded border"
                             >
-                                {{ tech.name }}
-                            </Badge>
+                                <img
+                                    v-if="tech.logo_path"
+                                    :src="`/storage/${tech.logo_path}`"
+                                    :alt="tech.name"
+                                    class="w-8 h-8 object-contain"
+                                />
+                                <div
+                                    v-else
+                                    class="w-8 h-8 rounded flex items-center justify-center text-xs font-bold text-white"
+                                    :style="{ backgroundColor: tech.color_code || '#666' }"
+                                >
+                                    {{ tech.name.substring(0, 2).toUpperCase() }}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium">{{ tech.name }}</div>
+                                    <div class="text-sm text-muted-foreground">
+                                        {{ tech.category === 'backend' ? 'Backend' :
+                                           tech.category === 'frontend' ? 'Frontend' :
+                                           tech.category === 'database' ? 'Base de données' :
+                                           tech.category === 'devops' ? 'DevOps' :
+                                           tech.category === 'design' ? 'Design' : 'Autre' }}
+                                    </div>
+                                </div>
+                                <Badge
+                                    :class="{
+                                        'bg-gray-500': tech.proficiency_level === 'beginner',
+                                        'bg-blue-500': tech.proficiency_level === 'intermediate',
+                                        'bg-green-500': tech.proficiency_level === 'advanced',
+                                        'bg-purple-500': tech.proficiency_level === 'expert'
+                                    }"
+                                >
+                                    {{ tech.proficiency_level === 'beginner' ? 'Débutant' :
+                                       tech.proficiency_level === 'intermediate' ? 'Intermédiaire' :
+                                       tech.proficiency_level === 'advanced' ? 'Avancé' : 'Expert' }}
+                                </Badge>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -166,14 +206,31 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <CardTitle>Techniques</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div class="flex flex-wrap gap-2">
-                            <Badge
+                        <div class="space-y-3">
+                            <div
                                 v-for="technique in project.techniques"
                                 :key="technique.id"
-                                variant="secondary"
+                                class="p-3 rounded border"
                             >
-                                {{ technique.name }}
-                            </Badge>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="font-medium">{{ technique.name }}</div>
+                                    <Badge
+                                        :class="{
+                                            'bg-gray-500': technique.proficiency_level === 'beginner',
+                                            'bg-blue-500': technique.proficiency_level === 'intermediate',
+                                            'bg-green-500': technique.proficiency_level === 'advanced',
+                                            'bg-purple-500': technique.proficiency_level === 'expert'
+                                        }"
+                                    >
+                                        {{ technique.proficiency_level === 'beginner' ? 'Débutant' :
+                                           technique.proficiency_level === 'intermediate' ? 'Intermédiaire' :
+                                           technique.proficiency_level === 'advanced' ? 'Avancé' : 'Expert' }}
+                                    </Badge>
+                                </div>
+                                <p v-if="technique.description" class="text-sm text-muted-foreground">
+                                    {{ technique.description }}
+                                </p>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

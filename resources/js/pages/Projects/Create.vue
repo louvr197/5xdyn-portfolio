@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import TiptapEditor from '@/components/TiptapEditor.vue';
 import {
     Select,
     SelectContent,
@@ -110,11 +111,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <!-- Long Description -->
                         <div class="space-y-2">
                             <Label for="long_description">Description détaillée</Label>
-                            <Textarea
-                                id="long_description"
+                            <TiptapEditor
                                 v-model="form.long_description"
-                                rows="8"
-                                :class="{ 'border-red-500': form.errors.long_description }"
+                                placeholder="Décrivez votre projet en détail..."
                             />
                             <p v-if="form.errors.long_description" class="text-sm text-red-500">
                                 {{ form.errors.long_description }}
