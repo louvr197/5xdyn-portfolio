@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Technology;
 use App\Models\Technique;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -61,8 +62,8 @@ class ProjectController extends Controller
     public function create()
     {
         return Inertia::render('Projects/Create', [
-            'technologies' => Technology::orderBy('name')->get(),
-            'techniques' => Technique::orderBy('name')->get(),
+            'technologies' => Technology::where('user_id', auth()->id())->orderBy('name')->get(),
+            'techniques' => Technique::where('user_id', auth()->id())->orderBy('name')->get(),
         ]);
     }
 
@@ -118,7 +119,12 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load(['technologies', 'techniques', 'galleries.images', 'user']);
+        $project->load([
+            'technologies:id,name,category,proficiency_level,logo_path,color_code',
+            'techniques:id,name,description,proficiency_level',
+            'galleries.images',
+            'user'
+        ]);
 
         return Inertia::render('Projects/Show', [
             'project' => $project,
@@ -130,14 +136,17 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $this->authorize('update', $project);
+        Gate::authorize('update', $project);
 
-        $project->load(['technologies', 'techniques']);
+        $project->load([
+            'technologies:id,name,category,proficiency_level,logo_path,color_code',
+            'techniques:id,name,description,proficiency_level'
+        ]);
 
         return Inertia::render('Projects/Edit', [
             'project' => $project,
-            'technologies' => Technology::orderBy('name')->get(),
-            'techniques' => Technique::orderBy('name')->get(),
+            'technologies' => Technology::where('user_id', auth()->id())->orderBy('name')->get(),
+            'techniques' => Technique::where('user_id', auth()->id())->orderBy('name')->get(),
         ]);
     }
 
@@ -146,7 +155,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        $this->authorize('update', $project);
+        Gate::authorize('update', $project);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -199,7 +208,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $this->authorize('delete', $project);
+        Gate::authorize('delete', $project);
 
         if ($project->main_image) {
             Storage::disk('public')->delete($project->main_image);
@@ -209,5 +218,52 @@ class ProjectController extends Controller
 
         return redirect()->route('projects.index')
             ->with('success', 'Projet supprimé avec succès.');
+    }
+
+    /**
+     * Reorder a project (move up or down).
+     */
+    public function reorder(Request $request, Project $project)
+    {
+        Gate::authorize('update', $project);
+
+        $validated = $request->validate([
+            'direction' => 'required|in:up,down',
+        ]);
+
+        $direction = $validated['direction'];
+        $currentOrder = $project->display_order ?? 0;
+
+        if ($direction === 'up') {
+            // Find the previous item with lower display_order
+            $previous = Project::where('user_id', auth()->id())
+                ->where('display_order', '<', $currentOrder)
+                ->orderBy('display_order', 'desc')
+                ->first();
+
+            if ($previous) {
+                $tempOrder = $project->display_order;
+                $project->display_order = $previous->display_order;
+                $previous->display_order = $tempOrder;
+                $project->save();
+                $previous->save();
+            }
+        } else {
+            // Find the next item with higher display_order
+            $next = Project::where('user_id', auth()->id())
+                ->where('display_order', '>', $currentOrder)
+                ->orderBy('display_order', 'asc')
+                ->first();
+
+            if ($next) {
+                $tempOrder = $project->display_order;
+                $project->display_order = $next->display_order;
+                $next->display_order = $tempOrder;
+                $project->save();
+                $next->save();
+            }
+        }
+
+        return back();
     }
 }
