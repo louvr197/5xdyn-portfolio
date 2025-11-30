@@ -1,0 +1,217 @@
+@startuml Portfolio Database Schema
+
+' Styling
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor PaleGreen
+    BorderColor DarkGreen
+    ArrowColor Black
+}
+
+' User and Authentication
+class User {
+    +id: bigint <<PK>>
+    +name: string
+    +slug: string <<unique>>
+    +email: string <<unique>>
+    +email_verified_at: datetime
+    +password: string
+    +remember_token: string
+    +role: enum(user, admin)
+    +two_factor_secret: text
+    +two_factor_recovery_codes: text
+    +two_factor_confirmed_at: datetime
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+' User Related Tables
+class Experience {
+    +id: bigint <<PK>>
+    +user_id: bigint <<FK>>
+    +position: string
+    +company: string
+    +location: string
+    +start_date: date
+    +end_date: date
+    +description: text
+    +display_order: int
+    +contract_type: enum
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+class Formation {
+    +id: bigint <<PK>>
+    +user_id: bigint <<FK>>
+    +degree: string
+    +institution: string
+    +location: string
+    +start_date: date
+    +end_date: date
+    +description: text
+    +display_order: int
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+class Information {
+    +id: bigint <<PK>>
+    +user_id: bigint <<FK>>
+    +last_name: string
+    +first_name: string
+    +professional_title: string
+    +email: string <<unique>>
+    +phone: string
+    +location: string
+    +availability: text
+    +bio: text
+    +picture_path: string
+    +cv_path: string
+    +social_links: json
+    +theme_color: string
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+' Project Related Tables
+class Project {
+    +id: bigint <<PK>>
+    +user_id: bigint <<FK>>
+    +title: string
+    +slug: string <<unique>>
+    +short_description: text
+    +long_description: text
+    +status: enum(draft, published, archived)
+    +type: enum(website, mobile_app, api, design, other)
+    +context: string
+    +completion_date: date
+    +main_image: string
+    +display_order: int
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+class Gallery {
+    +id: bigint <<PK>>
+    +project_id: bigint <<FK>>
+    +parent_id: bigint <<FK>>
+    +title: string
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+class Image {
+    +id: bigint <<PK>>
+    +gallery_id: bigint <<FK>>
+    +image_path: string
+    +alt_text: string
+    +description: text
+    +display_order: int
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+' Skills Tables
+class Technology {
+    +id: bigint <<PK>>
+    +user_id: bigint <<FK>>
+    +name: string
+    +category: enum(backend, frontend, database, devops, design, other)
+    +proficiency_level: enum(beginner, intermediate, advanced, expert)
+    +logo_path: string
+    +color_code: string
+    +display_order: int
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+class Technique {
+    +id: bigint <<PK>>
+    +user_id: bigint <<FK>>
+    +name: string
+    +description: text
+    +proficiency_level: enum(beginner, intermediate, advanced, expert)
+    +display_order: int
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+' Pivot Tables
+class ProjectTechnology <<pivot>> {
+    +id: bigint <<PK>>
+    +project_id: bigint <<FK>>
+    +technology_id: bigint <<FK>>
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+class ProjectTechnique <<pivot>> {
+    +id: bigint <<PK>>
+    +project_id: bigint <<FK>>
+    +technique_id: bigint <<FK>>
+    +created_at: datetime
+    +updated_at: datetime
+}
+
+' Relationships
+User "1" -- "0..*" Experience : has >
+User "1" -- "0..*" Formation : has >
+User "1" -- "0..1" Information : has >
+User "1" -- "0..*" Project : has >
+User "1" -- "0..*" Technology : has >
+User "1" -- "0..*" Technique : has >
+
+Project "1" -- "0..*" Gallery : has >
+Gallery "0..1" -- "0..*" Gallery : parent/children >
+Gallery "1" -- "0..*" Image : contains >
+
+Project "0..*" -- "0..*" ProjectTechnology
+ProjectTechnology "0..*" -- "0..*" Technology
+
+Project "0..*" -- "0..*" ProjectTechnique
+ProjectTechnique "0..*" -- "0..*" Technique
+
+note right of User
+  Central authentication model
+  Role: user or admin
+  Slug for public portfolio URL
+  Manages experiences, formations, and personal info
+end note
+
+note right of Information
+  Extended user profile
+  CV upload, social links (JSON)
+  Theme color customization
+  Public contact details
+end note
+
+note right of Project
+  Portfolio projects with slug-based routing
+  Status: draft, published, archived
+  Type: website, mobile_app, api, design, other
+  Rich text descriptions with TipTap
+end note
+
+note right of Gallery
+  Hierarchical image galleries
+  Can have parent gallery (nested structure)
+  Multiple galleries per project
+end note
+
+note bottom of Technology
+  User-specific technologies
+  Categories: backend, frontend,
+  database, devops, design, other
+end note
+
+note bottom of Technique
+  User-specific techniques
+  Proficiency levels:
+  beginner, intermediate,
+  advanced, expert
+end note
+
+@enduml
